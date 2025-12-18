@@ -77,6 +77,8 @@ const destinations = {
     },
 };
 
+import { Metadata } from "next";
+
 export function generateStaticParams() {
     return Object.keys(destinations).map((slug) => ({
         slug,
@@ -85,6 +87,40 @@ export function generateStaticParams() {
 
 interface PageProps {
     params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { slug } = await params;
+    const country = destinations[slug as keyof typeof destinations];
+
+    if (!country) {
+        return {
+            title: "Destination Not Found",
+        };
+    }
+
+    return {
+        title: country.title,
+        description: country.description,
+        openGraph: {
+            title: `${country.title} | OrvitasGlobal`,
+            description: country.description,
+            images: [
+                {
+                    url: country.heroImage,
+                    width: 1200,
+                    height: 630,
+                    alt: `Study in ${country.name}`,
+                },
+            ],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: `${country.title} | OrvitasGlobal`,
+            description: country.description,
+            images: [country.heroImage],
+        },
+    };
 }
 
 export default async function DestinationPage({ params }: PageProps) {
