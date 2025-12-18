@@ -13,8 +13,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "OrvitasGlobal | Premium Audio & Visual Solutions", // Placeholder, will update
-  description: "OrvitasGlobal Student Consultancy",
+  title: "OrvitasGlobal | Premier Student Consultancy",
+  description: "Expert guidance for students aspiring to study in the UK, Europe, Canada, and Australia.",
 };
 
 export default function RootLayout({
