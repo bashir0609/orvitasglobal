@@ -20,13 +20,13 @@ export default function Home() {
     {
       name: "Australia",
       description: "Innovative education system, vibrant cities, and incredible lifestyle for international students.",
-      image: "https://images.unsplash.com/photo-1523482580638-016775bc2522?q=80&w=1000&auto=format&fit=crop", // Sydney Opera House
+      image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=1000&auto=format&fit=crop", // Sydney Opera House (Reliable)
       link: "/destinations/australia",
     },
     {
       name: "Europe",
       description: "Diverse study options across Schengen countries with affordable tuition and rich history.",
-      image: "https://images.unsplash.com/photo-1499856871940-a09627c6dcf6?q=80&w=1000&auto=format&fit=crop", // Paris / General Europe
+      image: "https://images.unsplash.com/photo-1473951574080-01fe45ec8643?q=80&w=1000&auto=format&fit=crop", // Prague / Europe General (Reliable)
       link: "/destinations/europe",
     },
   ];
