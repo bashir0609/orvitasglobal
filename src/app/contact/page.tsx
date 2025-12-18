@@ -4,6 +4,76 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+
+function ContactForm() {
+    const searchParams = useSearchParams();
+    const destination = searchParams.get("destination") || "";
+
+    return (
+        <div className="bg-secondary p-8 rounded-3xl border border-white/5 shadow-2xl">
+            <form className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <label htmlFor="name" className="text-sm font-medium">Full Name</label>
+                        <input
+                            type="text" id="name" placeholder="John Doe"
+                            className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label htmlFor="phone" className="text-sm font-medium">Phone Number</label>
+                        <input
+                            type="tel" id="phone" placeholder="+1 (555) 000-0000"
+                            className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition"
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <label htmlFor="email" className="text-sm font-medium">Email Address</label>
+                    <input
+                        type="email" id="email" placeholder="john@example.com"
+                        className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition"
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <label htmlFor="destination" className="text-sm font-medium">Preferred Destination</label>
+                    <select
+                        id="destination"
+                        defaultValue={destination}
+                        className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition"
+                    >
+                        <option value="">Select a country</option>
+                        <option value="uk">United Kingdom</option>
+                        <option value="canada">Canada</option>
+                        <option value="australia">Australia</option>
+                        <option value="europe">Europe</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div className="space-y-2">
+                    <label htmlFor="message" className="text-sm font-medium">Message</label>
+                    <textarea
+                        id="message" rows={4} placeholder="Tell us about your educational background and goals..."
+                        className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition resize-none"
+                    ></textarea>
+                </div>
+
+                <button
+                    type="button"
+                    className="w-full py-4 bg-accent text-accent-foreground font-bold rounded-xl hover:bg-yellow-400 transition shadow-lg transform active:scale-95 flex items-center justify-center space-x-2"
+                >
+                    <span>Send Message</span>
+                    <Send size={18} />
+                </button>
+            </form>
+        </div>
+    );
+}
 
 export default function ContactPage() {
     return (
@@ -74,70 +144,15 @@ export default function ContactPage() {
                         </div>
                     </motion.div>
 
-                    {/* Contact Form */}
+                    {/* Contact Form with Suspense Boundary */}
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
-                        className="bg-secondary p-8 rounded-3xl border border-white/5 shadow-2xl"
                     >
-                        <form className="space-y-6">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label htmlFor="name" className="text-sm font-medium">Full Name</label>
-                                    <input
-                                        type="text" id="name" placeholder="John Doe"
-                                        className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="phone" className="text-sm font-medium">Phone Number</label>
-                                    <input
-                                        type="tel" id="phone" placeholder="+1 (555) 000-0000"
-                                        className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label htmlFor="email" className="text-sm font-medium">Email Address</label>
-                                <input
-                                    type="email" id="email" placeholder="john@example.com"
-                                    className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <label htmlFor="destination" className="text-sm font-medium">Preferred Destination</label>
-                                <select
-                                    id="destination"
-                                    className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition"
-                                >
-                                    <option value="">Select a country</option>
-                                    <option value="uk">United Kingdom</option>
-                                    <option value="canada">Canada</option>
-                                    <option value="australia">Australia</option>
-                                    <option value="europe">Europe</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label htmlFor="message" className="text-sm font-medium">Message</label>
-                                <textarea
-                                    id="message" rows={4} placeholder="Tell us about your educational background and goals..."
-                                    className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition resize-none"
-                                ></textarea>
-                            </div>
-
-                            <button
-                                type="button" // Change to submit when wired up
-                                className="w-full py-4 bg-accent text-accent-foreground font-bold rounded-xl hover:bg-yellow-400 transition shadow-lg transform active:scale-95 flex items-center justify-center space-x-2"
-                            >
-                                <span>Send Message</span>
-                                <Send size={18} />
-                            </button>
-                        </form>
+                        <Suspense fallback={<div className="text-center p-8">Loading form...</div>}>
+                            <ContactForm />
+                        </Suspense>
                     </motion.div>
                 </div>
 

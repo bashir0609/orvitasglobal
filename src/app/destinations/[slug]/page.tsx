@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -172,9 +173,12 @@ export default async function DestinationPage({ params }: PageProps) {
                                 </div>
                             </div>
 
-                            <button className="w-full mt-8 py-3 bg-accent text-accent-foreground font-bold rounded-xl hover:bg-yellow-400 transition shadow-lg transform hover:-translate-y-1">
+                            <Link
+                                href={`/contact?destination=${slug}`}
+                                className="w-full mt-8 py-3 bg-accent text-accent-foreground font-bold rounded-xl hover:bg-yellow-400 transition shadow-lg transform hover:-translate-y-1 block text-center"
+                            >
                                 Apply Now
-                            </button>
+                            </Link>
                         </div>
                     </div>
 
