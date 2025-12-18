@@ -19,15 +19,15 @@ export default function Navbar() {
 
     const navLinks = [
         { name: "Home", href: "/" },
-        { name: "Destinations", href: "#destinations" }, // Will likely update to dropdown later
+        { name: "Destinations", href: "/#destinations" },
         { name: "About", href: "/about" },
     ];
 
     return (
         <nav
             className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled
-                    ? "bg-background/80 backdrop-blur-md border-b border-white/10 shadow-lg"
-                    : "bg-transparent"
+                ? "bg-background/80 backdrop-blur-md border-b border-white/10 shadow-lg"
+                : "bg-transparent"
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
