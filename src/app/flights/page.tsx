@@ -39,7 +39,9 @@ export default function FlightsPage() {
             }
 
             // Call search API
-            const response = await fetch(`/api/amadeus/search?${queryParams.toString()}`);
+            const response = await fetch(`/api/amadeus/search?${queryParams.toString()}`, {
+                cache: 'no-store'
+            });
             const data = await response.json();
 
             if (!response.ok) {
