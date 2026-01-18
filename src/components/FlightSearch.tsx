@@ -348,7 +348,7 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10 pointer-events-none" size={20} />
             <DatePicker
               selected={departureDate}
-              onChange={(date) => setDepartureDate(date)}
+              onChange={(date: Date | null) => setDepartureDate(date)}
               minDate={new Date()}
               dateFormat="MMM dd, yyyy"
               placeholderText="Select date"
@@ -366,7 +366,7 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
               <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10 pointer-events-none" size={20} />
               <DatePicker
                 selected={returnDate}
-                onChange={(date) => setReturnDate(date)}
+                onChange={(date: Date | null) => setReturnDate(date)}
                 minDate={departureDate || new Date()}
                 dateFormat="MMM dd, yyyy"
                 placeholderText="Select date"
