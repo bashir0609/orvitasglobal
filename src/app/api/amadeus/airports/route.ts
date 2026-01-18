@@ -41,6 +41,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       data: airports,
+      _debug: {
+        keywordReceived: keyword,
+        envCheck: process.env.AMADEUS_API_KEY ? 'Loaded' : 'Missing',
+        keyPrefix: process.env.AMADEUS_API_KEY ? process.env.AMADEUS_API_KEY.substring(0, 4) : 'N/A',
+        timestamp: new Date().toISOString(),
+        rawResponseKeys: Object.keys(response),
+        rawDataCount: dataList ? dataList.length : 'null'
+      }
     });
 
   } catch (error: any) {
