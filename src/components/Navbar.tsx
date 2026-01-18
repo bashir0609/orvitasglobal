@@ -20,7 +20,7 @@ export default function Navbar() {
     const navLinks = [
         { name: "Home", href: "/" },
         { name: "Destinations", href: "/#destinations" },
-        { name: "Flight Tracker", href: "/flights" },
+        { name: "Flights", href: "/flights" },
         { name: "About", href: "/about" },
     ];
 

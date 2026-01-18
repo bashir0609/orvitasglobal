@@ -47,6 +47,11 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
+                                <Link href="/flights" className="text-muted-foreground hover:text-accent text-sm transition">
+                                    Flights
+                                </Link>
+                            </li>
+                            <li>
                                 <Link href="/about" className="text-muted-foreground hover:text-accent text-sm transition">
                                     About Us
                                 </Link>
