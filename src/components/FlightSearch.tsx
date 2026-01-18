@@ -108,6 +108,15 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
           setDestinationSuggestions(data.data);
           setShowDestinationDropdown(true);
         }
+      } else {
+        // Even if empty, show dropdown to display "No results" message
+        if (type === 'origin') {
+            setOriginSuggestions([]);
+            setShowOriginDropdown(true);
+        } else {
+            setDestinationSuggestions([]);
+            setShowDestinationDropdown(true);
+        }
       }
     } catch (error) {
       console.error('Airport search error:', error);
@@ -233,28 +242,37 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
               </div>
             )}
           </div>
-          {showOriginDropdown && originSuggestions.length > 0 && (
-            <div className="absolute z-50 w-full mt-2 bg-secondary border border-white/10 rounded-lg shadow-xl max-h-60 overflow-y-auto">
-              {originSuggestions.map((airport) => (
-                <button
-                  key={airport.iataCode}
-                  type="button"
-                  onClick={() => selectAirport(airport, 'origin')}
-                  className="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors border-b border-white/5 last:border-0"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium">{airport.cityName}</div>
-                      <div className="text-sm text-muted-foreground truncate">
-                        {airport.name}
+            {showOriginDropdown && (
+              <div className="absolute z-50 w-full mt-2 bg-secondary border border-white/10 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                {originSuggestions.length > 0 ? (
+                  originSuggestions.map((airport) => (
+                    <button
+                      key={airport.iataCode}
+                      type="button"
+                      onClick={() => selectAirport(airport, 'origin')}
+                      className="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors border-b border-white/5 last:border-0"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium">{airport.cityName}</div>
+                          <div className="text-sm text-muted-foreground truncate">
+                            {airport.name}
+                          </div>
+                        </div>
+                        <div className="text-accent font-bold ml-2">{airport.iataCode}</div>
                       </div>
-                    </div>
-                    <div className="text-accent font-bold ml-2">{airport.iataCode}</div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-sm text-muted-foreground">
+                    <p className="font-medium mb-1">No results found</p>
+                    <p className="text-xs opacity-70">
+                      Test Mode likely supports only: US, UK, ES, DE, IN
+                    </p>
                   </div>
-                </button>
-              ))}
-            </div>
-          )}
+                )}
+              </div>
+            )}
         </div>
 
         {/* Destination */}
@@ -269,11 +287,12 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
                 setDestinationInput(e.target.value);
                 if (selectedDestination) setSelectedDestination(null);
               }}
-              onFocus={() => destinationSuggestions.length > 0 && setShowDestinationDropdown(true)}
+              onFocus={() => setShowDestinationDropdown(true)}
               placeholder="Type city or airport..."
               required
               className="w-full pl-11 pr-10 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
             />
+            {/* Same clear button and spinner code... */}
             {(destinationInput || selectedDestination) && (
               <button
                 type="button"
@@ -289,26 +308,35 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
               </div>
             )}
           </div>
-          {showDestinationDropdown && destinationSuggestions.length > 0 && (
+          {showDestinationDropdown && (
             <div className="absolute z-50 w-full mt-2 bg-secondary border border-white/10 rounded-lg shadow-xl max-h-60 overflow-y-auto">
-              {destinationSuggestions.map((airport) => (
-                <button
-                  key={airport.iataCode}
-                  type="button"
-                  onClick={() => selectAirport(airport, 'destination')}
-                  className="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors border-b border-white/5 last:border-0"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium">{airport.cityName}</div>
-                      <div className="text-sm text-muted-foreground truncate">
-                        {airport.name}
+              {destinationSuggestions.length > 0 ? (
+                destinationSuggestions.map((airport) => (
+                  <button
+                    key={airport.iataCode}
+                    type="button"
+                    onClick={() => selectAirport(airport, 'destination')}
+                    className="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors border-b border-white/5 last:border-0"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">{airport.cityName}</div>
+                        <div className="text-sm text-muted-foreground truncate">
+                          {airport.name}
+                        </div>
                       </div>
+                      <div className="text-accent font-bold ml-2">{airport.iataCode}</div>
                     </div>
-                    <div className="text-accent font-bold ml-2">{airport.iataCode}</div>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                ))
+              ) : (
+                <div className="p-4 text-center text-sm text-muted-foreground">
+                  <p className="font-medium mb-1">No results found</p>
+                  <p className="text-xs opacity-70">
+                    Test Mode likely supports only: US, UK, ES, DE, IN
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
