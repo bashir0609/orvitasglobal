@@ -92,11 +92,11 @@ export default function Footer() {
                         <ul className="space-y-4">
                             <li className="flex items-start space-x-3 text-sm text-muted-foreground">
                                 <MapPin size={18} className="text-accent flex-shrink-0 mt-0.5" />
-                                <span>123 Education Street, Consultancy Hub, London, UK</span>
+                                <span>9th Floor, Millennium Market, Zindabazar, Sylhet 3100, Bangladesh</span>
                             </li>
                             <li className="flex items-center space-x-3 text-sm text-muted-foreground">
                                 <Phone size={18} className="text-accent flex-shrink-0" />
-                                <span>+44 123 456 7890</span>
+                                <span>+880 1796-624198</span>
                             </li>
                             <li className="flex items-center space-x-3 text-sm text-muted-foreground">
                                 <Mail size={18} className="text-accent flex-shrink-0" />
