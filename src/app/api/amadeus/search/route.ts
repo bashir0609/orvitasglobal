@@ -35,11 +35,18 @@ export async function GET(request: NextRequest) {
     // Search for flight offers
     const response = await amadeus.shopping.flightOffersSearch.get(params);
 
+    console.log('Amadeus Flight Search Response:', JSON.stringify(response.data, null, 2).substring(0, 500) + '...');
+    
+    // Check if data is directly in response.data or nested
+    const responseData = response.data;
+
+
+    // Return flight offers
     // Return flight offers
     return NextResponse.json({
-      meta: response.data.meta || { count: response.data.data?.length || 0 },
-      data: response.data.data || [],
-      dictionaries: response.data.dictionaries || {},
+      meta: responseData.meta || { count: Array.isArray(responseData) ? responseData.length : (responseData.data?.length || 0) },
+      data: Array.isArray(responseData) ? responseData : (responseData.data || []),
+      dictionaries: responseData.dictionaries || {},
     } as FlightOffersResponse);
 
   } catch (error: any) {
