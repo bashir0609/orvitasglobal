@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Search, Calendar, Users, Plane, MapPin, X } from 'lucide-react';
+import { Search, Calendar, Users, Plane, MapPin, X, AlertCircle } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
 import type { Airport } from '@/types/amadeus';
 
 interface FlightSearchProps {
@@ -183,8 +184,8 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
     const params: SearchParams = {
       origin: selectedOrigin.iataCode,
       destination: selectedDestination.iataCode,
-      departureDate: departureDate.toISOString().split('T')[0],
-      returnDate: tripType === 'round-trip' && returnDate ? returnDate.toISOString().split('T')[0] : undefined,
+      departureDate: format(departureDate, 'yyyy-MM-dd'),
+      returnDate: tripType === 'round-trip' && returnDate ? format(returnDate, 'yyyy-MM-dd') : undefined,
       adults,
       children,
       infants,
