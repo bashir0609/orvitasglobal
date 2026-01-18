@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Search, Calendar, Users, Plane } from 'lucide-react';
+import { Search, Calendar, Users, Plane, MapPin, X } from 'lucide-react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import type { Airport } from '@/types/amadeus';
 
 interface FlightSearchProps {
@@ -23,10 +25,12 @@ export interface SearchParams {
 
 export default function FlightSearch({ onSearch, isLoading = false }: FlightSearchProps) {
   const [tripType, setTripType] = useState<'round-trip' | 'one-way'>('round-trip');
-  const [origin, setOrigin] = useState('');
-  const [destination, setDestination] = useState('');
-  const [departureDate, setDepartureDate] = useState('');
-  const [returnDate, setReturnDate] = useState('');
+  const [originInput, setOriginInput] = useState('');
+  const [destinationInput, setDestinationInput] = useState('');
+  const [selectedOrigin, setSelectedOrigin] = useState<Airport | null>(null);
+  const [selectedDestination, setSelectedDestination] = useState<Airport | null>(null);
+  const [departureDate, setDepartureDate] = useState<Date | null>(null);
+  const [returnDate, setReturnDate] = useState<Date | null>(null);
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
@@ -37,6 +41,8 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
   const [showOriginDropdown, setShowOriginDropdown] = useState(false);
   const [showDestinationDropdown, setShowDestinationDropdown] = useState(false);
   const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
+  const [isSearchingOrigin, setIsSearchingOrigin] = useState(false);
+  const [isSearchingDestination, setIsSearchingDestination] = useState(false);
   
   const originRef = useRef<HTMLDivElement>(null);
   const destinationRef = useRef<HTMLDivElement>(null);
@@ -60,6 +66,25 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Debounced airport search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (originInput.length >= 2 && !selectedOrigin) {
+        searchAirports(originInput, 'origin');
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [originInput, selectedOrigin]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (destinationInput.length >= 2 && !selectedDestination) {
+        searchAirports(destinationInput, 'destination');
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [destinationInput, selectedDestination]);
+
   // Search airports
   const searchAirports = async (keyword: string, type: 'origin' | 'destination') => {
     if (keyword.length < 2) {
@@ -67,6 +92,9 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
       else setDestinationSuggestions([]);
       return;
     }
+
+    if (type === 'origin') setIsSearchingOrigin(true);
+    else setIsSearchingDestination(true);
 
     try {
       const response = await fetch(`/api/amadeus/airports?keyword=${encodeURIComponent(keyword)}`);
@@ -83,43 +111,54 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
       }
     } catch (error) {
       console.error('Airport search error:', error);
+    } finally {
+      if (type === 'origin') setIsSearchingOrigin(false);
+      else setIsSearchingDestination(false);
     }
   };
 
-  const handleOriginChange = (value: string) => {
-    setOrigin(value);
-    searchAirports(value, 'origin');
-  };
-
-  const handleDestinationChange = (value: string) => {
-    setDestination(value);
-    searchAirports(value, 'destination');
-  };
-
   const selectAirport = (airport: Airport, type: 'origin' | 'destination') => {
-    const displayValue = `${airport.cityName} (${airport.iataCode})`;
     if (type === 'origin') {
-      setOrigin(displayValue);
+      setSelectedOrigin(airport);
+      setOriginInput(`${airport.cityName}, ${airport.countryName} (${airport.iataCode})`);
       setShowOriginDropdown(false);
     } else {
-      setDestination(displayValue);
+      setSelectedDestination(airport);
+      setDestinationInput(`${airport.cityName}, ${airport.countryName} (${airport.iataCode})`);
       setShowDestinationDropdown(false);
     }
   };
 
-  const extractIataCode = (value: string): string => {
-    const match = value.match(/\(([A-Z]{3})\)/);
-    return match ? match[1] : value.toUpperCase().substring(0, 3);
+  const clearOrigin = () => {
+    setSelectedOrigin(null);
+    setOriginInput('');
+    setOriginSuggestions([]);
+  };
+
+  const clearDestination = () => {
+    setSelectedDestination(null);
+    setDestinationInput('');
+    setDestinationSuggestions([]);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!selectedOrigin || !selectedDestination || !departureDate) {
+      alert('Please select origin, destination, and departure date');
+      return;
+    }
+
+    if (tripType === 'round-trip' && !returnDate) {
+      alert('Please select return date for round-trip');
+      return;
+    }
+
     const params: SearchParams = {
-      origin: extractIataCode(origin),
-      destination: extractIataCode(destination),
-      departureDate,
-      returnDate: tripType === 'round-trip' ? returnDate : undefined,
+      origin: selectedOrigin.iataCode,
+      destination: selectedDestination.iataCode,
+      departureDate: departureDate.toISOString().split('T')[0],
+      returnDate: tripType === 'round-trip' && returnDate ? returnDate.toISOString().split('T')[0] : undefined,
       adults,
       children,
       infants,
@@ -166,15 +205,33 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
         <div ref={originRef} className="relative">
           <label className="block text-sm font-medium mb-2">From</label>
           <div className="relative">
-            <Plane className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10" size={20} />
             <input
               type="text"
-              value={origin}
-              onChange={(e) => handleOriginChange(e.target.value)}
-              placeholder="City or Airport"
+              value={originInput}
+              onChange={(e) => {
+                setOriginInput(e.target.value);
+                if (selectedOrigin) setSelectedOrigin(null);
+              }}
+              onFocus={() => originSuggestions.length > 0 && setShowOriginDropdown(true)}
+              placeholder="Type city or airport..."
               required
-              className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+              className="w-full pl-11 pr-10 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
             />
+            {(originInput || selectedOrigin) && (
+              <button
+                type="button"
+                onClick={clearOrigin}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground z-10"
+              >
+                <X size={16} />
+              </button>
+            )}
+            {isSearchingOrigin && (
+              <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                <div className="w-4 h-4 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+              </div>
+            )}
           </div>
           {showOriginDropdown && originSuggestions.length > 0 && (
             <div className="absolute z-50 w-full mt-2 bg-secondary border border-white/10 rounded-lg shadow-xl max-h-60 overflow-y-auto">
@@ -185,9 +242,14 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
                   onClick={() => selectAirport(airport, 'origin')}
                   className="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors border-b border-white/5 last:border-0"
                 >
-                  <div className="font-medium">{airport.cityName}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {airport.name} ({airport.iataCode})
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium">{airport.cityName}</div>
+                      <div className="text-sm text-muted-foreground truncate">
+                        {airport.name}
+                      </div>
+                    </div>
+                    <div className="text-accent font-bold ml-2">{airport.iataCode}</div>
                   </div>
                 </button>
               ))}
@@ -199,15 +261,33 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
         <div ref={destinationRef} className="relative">
           <label className="block text-sm font-medium mb-2">To</label>
           <div className="relative">
-            <Plane className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground rotate-90" size={20} />
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10" size={20} />
             <input
               type="text"
-              value={destination}
-              onChange={(e) => handleDestinationChange(e.target.value)}
-              placeholder="City or Airport"
+              value={destinationInput}
+              onChange={(e) => {
+                setDestinationInput(e.target.value);
+                if (selectedDestination) setSelectedDestination(null);
+              }}
+              onFocus={() => destinationSuggestions.length > 0 && setShowDestinationDropdown(true)}
+              placeholder="Type city or airport..."
               required
-              className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+              className="w-full pl-11 pr-10 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
             />
+            {(destinationInput || selectedDestination) && (
+              <button
+                type="button"
+                onClick={clearDestination}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground z-10"
+              >
+                <X size={16} />
+              </button>
+            )}
+            {isSearchingDestination && (
+              <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                <div className="w-4 h-4 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+              </div>
+            )}
           </div>
           {showDestinationDropdown && destinationSuggestions.length > 0 && (
             <div className="absolute z-50 w-full mt-2 bg-secondary border border-white/10 rounded-lg shadow-xl max-h-60 overflow-y-auto">
@@ -218,9 +298,14 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
                   onClick={() => selectAirport(airport, 'destination')}
                   className="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors border-b border-white/5 last:border-0"
                 >
-                  <div className="font-medium">{airport.cityName}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {airport.name} ({airport.iataCode})
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium">{airport.cityName}</div>
+                      <div className="text-sm text-muted-foreground truncate">
+                        {airport.name}
+                      </div>
+                    </div>
+                    <div className="text-accent font-bold ml-2">{airport.iataCode}</div>
                   </div>
                 </button>
               ))}
@@ -229,34 +314,36 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
         </div>
 
         {/* Departure Date */}
-        <div>
+        <div className="flight-datepicker">
           <label className="block text-sm font-medium mb-2">Departure</label>
           <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-            <input
-              type="date"
-              value={departureDate}
-              onChange={(e) => setDepartureDate(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
+            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10 pointer-events-none" size={20} />
+            <DatePicker
+              selected={departureDate}
+              onChange={(date) => setDepartureDate(date)}
+              minDate={new Date()}
+              dateFormat="MMM dd, yyyy"
+              placeholderText="Select date"
               required
-              className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+              className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent text-foreground"
             />
           </div>
         </div>
 
         {/* Return Date */}
         {tripType === 'round-trip' && (
-          <div>
+          <div className="flight-datepicker">
             <label className="block text-sm font-medium mb-2">Return</label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-              <input
-                type="date"
-                value={returnDate}
-                onChange={(e) => setReturnDate(e.target.value)}
-                min={departureDate || new Date().toISOString().split('T')[0]}
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10 pointer-events-none" size={20} />
+              <DatePicker
+                selected={returnDate}
+                onChange={(date) => setReturnDate(date)}
+                minDate={departureDate || new Date()}
+                dateFormat="MMM dd, yyyy"
+                placeholderText="Select date"
                 required={tripType === 'round-trip'}
-                className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent text-foreground"
               />
             </div>
           </div>

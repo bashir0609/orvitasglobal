@@ -1,0 +1,99 @@
+/* React DatePicker Custom Styles */
+.flight-datepicker .react-datepicker-wrapper {
+  width: 100%;
+}
+
+.flight-datepicker .react-datepicker__input-container input {
+  cursor: pointer;
+}
+
+.react-datepicker {
+  font-family: inherit;
+  background-color: hsl(var(--secondary));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.react-datepicker__header {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding-top: 12px;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  color: hsl(var(--foreground));
+}
+
+.react-datepicker__day {
+  color: hsl(var(--muted-foreground));
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.react-datepicker__day:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: hsl(var(--foreground));
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: hsl(var(--accent));
+  color: white;
+  font-weight: 600;
+}
+
+.react-datepicker__day--selected:hover,
+.react-datepicker__day--keyboard-selected:hover {
+  background-color: hsl(var(--accent));
+  opacity: 0.9;
+}
+
+.react-datepicker__day--disabled {
+  color: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+}
+
+.react-datepicker__day--disabled:hover {
+  background-color: transparent;
+}
+
+.react-datepicker__day--today {
+  font-weight: 600;
+  color: hsl(var(--accent));
+}
+
+.react-datepicker__navigation {
+  top: 16px;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: hsl(var(--muted-foreground));
+}
+
+.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+  border-color: hsl(var(--foreground));
+}
+
+.react-datepicker__month {
+  margin: 12px;
+}
+
+.react-datepicker__day--in-range,
+.react-datepicker__day--in-selecting-range {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: hsl(var(--foreground));
+}
+
+.react-datepicker__day--range-start,
+.react-datepicker__day--range-end {
+  background-color: hsl(var(--accent)) !important;
+  color: white !important;
+}
+
+.react-datepicker__triangle {
+  display: none;
+}
