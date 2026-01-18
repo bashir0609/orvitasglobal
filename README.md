@@ -1,4 +1,9 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Features
+
+- **Flight Booking Engine**: Real-time flight search and booking powered by Amadeus API
+- **Smart Search**: Autocomplete for airports and cities with debounce
+- **Responsive Design**: Premium UI built with Tailwind CSS and Framer Motion
+- **Secure Architecture**: API keys protected via server-side API routes
 
 ## Getting Started
 
