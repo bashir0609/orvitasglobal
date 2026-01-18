@@ -43,6 +43,7 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
   const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
   const [isSearchingOrigin, setIsSearchingOrigin] = useState(false);
   const [isSearchingDestination, setIsSearchingDestination] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
   const originRef = useRef<HTMLDivElement>(null);
   const destinationRef = useRef<HTMLDivElement>(null);
@@ -97,9 +98,22 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
     else setIsSearchingDestination(true);
 
     try {
+      setErrorMessage(null);
       const response = await fetch(`/api/amadeus/airports?keyword=${encodeURIComponent(keyword)}`);
       const data = await response.json();
       
+      if (!response.ok) {
+        setErrorMessage(data.error || 'Airport search failed');
+        if (type === 'origin') {
+            setOriginSuggestions([]);
+            setShowOriginDropdown(true);
+        } else {
+            setDestinationSuggestions([]);
+            setShowDestinationDropdown(true);
+        }
+        return;
+      }
+
       if (data.data) {
         if (type === 'origin') {
           setOriginSuggestions(data.data);
@@ -244,7 +258,13 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
           </div>
             {showOriginDropdown && (
               <div className="absolute z-50 w-full mt-2 bg-secondary border border-white/10 rounded-lg shadow-xl max-h-60 overflow-y-auto">
-                {originSuggestions.length > 0 ? (
+                {errorMessage ? (
+                  <div className="p-4 text-center text-red-400">
+                    <p className="font-medium mb-1">Search Error</p>
+                    <p className="text-xs">{errorMessage}</p>
+                    <p className="text-xs opacity-70 mt-1">Check API credentials in dashboard</p>
+                  </div>
+                ) : originSuggestions.length > 0 ? (
                   originSuggestions.map((airport) => (
                     <button
                       key={airport.iataCode}
@@ -310,7 +330,12 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
           </div>
           {showDestinationDropdown && (
             <div className="absolute z-50 w-full mt-2 bg-secondary border border-white/10 rounded-lg shadow-xl max-h-60 overflow-y-auto">
-              {destinationSuggestions.length > 0 ? (
+              {errorMessage ? (
+                <div className="p-4 text-center text-red-400">
+                  <p className="font-medium mb-1">Search Error</p>
+                  <p className="text-xs">{errorMessage}</p>
+                </div>
+              ) : destinationSuggestions.length > 0 ? (
                 destinationSuggestions.map((airport) => (
                   <button
                     key={airport.iataCode}
