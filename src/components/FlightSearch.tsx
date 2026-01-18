@@ -103,7 +103,10 @@ export default function FlightSearch({ onSearch, isLoading = false }: FlightSear
       const data = await response.json();
       
       if (!response.ok) {
-        setErrorMessage(data.error || 'Airport search failed');
+        const details = data.details ? JSON.stringify(data.details) : '';
+        setErrorMessage(data.message || data.error || 'Airport search failed');
+        if (details) console.log('Error details:', details); // Log details to console
+        
         if (type === 'origin') {
             setOriginSuggestions([]);
             setShowOriginDropdown(true);
