@@ -24,8 +24,14 @@ export async function GET(request: NextRequest) {
       subType: 'AIRPORT,CITY',
     });
 
+    console.log('Amadeus Response Data:', JSON.stringify(response.data, null, 2));
+
+    // Determine correct data path
+    const dataList = Array.isArray(response.data) ? response.data : (response.data?.data || []);
+
+
     // Format response
-    const airports: Airport[] = (response.data.data || []).map((location: any) => ({
+    const airports: Airport[] = dataList.map((location: any) => ({
       iataCode: location.iataCode,
       name: location.name,
       cityName: location.address?.cityName || '',
